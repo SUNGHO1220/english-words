@@ -182,7 +182,7 @@ ridicule|조롱, 조롱하다
 drape|걸치다
 shovel|삽`}
 ];
-const APP_VERSION = 'v1.1';
+const APP_VERSION = 'v1.2';
 
 /* ---------------- 유틸 ---------------- */
 const app = document.getElementById('app');
@@ -250,7 +250,13 @@ function markWrong(w){ S.wrong[w.en] = (S.wrong[w.en]||0)+1; }
 let TICK = null;
 function stopTick(){ if (TICK) { clearInterval(TICK); TICK = null; } }
 function topBar(title, back='home'){ return `<div class="top"><button class="back" onclick="go('${back}')">←</button><h1>${title}</h1></div>`; }
-function go(s){ stopTick(); window.scrollTo(0,0); ({home, cards:startCards, test:testMenu, games:gameMenu, wrong:wrongScreen, manage})[s](); }
+function go(s){
+  stopTick();
+  try { window.scrollTo(0,0); } catch(e){}
+  const screens = {home:home, cards:startCards, test:testMenu, games:gameMenu, wrong:wrongScreen, manage:manage};
+  try { screens[s](); } catch(e) { toast('화면 오류: ' + (e && e.message)); if (s !== 'home') home(); }
+}
+window.addEventListener('error', function(e){ toast('오류: ' + e.message); });
 
 /* ================= 홈 ================= */
 function home(){
@@ -278,6 +284,7 @@ function home(){
   <div class="note" style="text-align:center;margin-top:18px">${APP_VERSION}</div>`;
 }
 function toggleSel(id){
+  if (id === 'wrong' && !wrongList().length && !S.sel.includes('wrong')) { toast('아직 틀린 단어가 없어요 🎉'); return; }
   const i = S.sel.indexOf(id);
   if (i >= 0) S.sel.splice(i,1); else S.sel.push(id);
   save(); home();
@@ -425,7 +432,7 @@ function overrideQ(){
   addXP(10); beep(true);
   document.querySelector('.fb').className = 'fb ok';
   document.querySelector('.fb .big').textContent = '맞은 걸로 할게요! 👍';
-  document.querySelector('.fb + .btn.gray')?.remove();
+  const ob = document.querySelector('.fb + .btn.gray'); if (ob) ob.remove();
 }
 function nextQ(){ Q.i++; if (Q.i >= Q.list.length) quizResult(); else renderQ(); }
 function quizResult(){
