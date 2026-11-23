@@ -120,7 +120,7 @@ summary{font-weight:800;cursor:pointer}
    ================================================================ */
 const BOOK_TITLE = 'Words make you';
 const BUILTIN_RAW = [
- {id:'p152', name:'152쪽', raw:`
+ {id:'ch1', name:'챕터 1', raw:`
 accountant|회계사
 pervasive|만연한
 assimilate|동화하다, 흡수하다
@@ -135,8 +135,7 @@ vivacious|활발한, 명랑한
 hamper|방해하다
 splendid|훌륭한, 정말 좋은
 backtrack|되짚어 가다
-sabotage|파괴하다`},
- {id:'p154', name:'154쪽', raw:`
+sabotage|파괴하다
 miscellaneous|여러 가지 종류의
 denote|조짐을 보이다
 utilitarian|실용적인, 공리적인
@@ -151,8 +150,7 @@ gravy|육즙
 deviant|벗어난, 일탈적인
 downfall|몰락
 binocular|두 눈으로 보이는
-formulate|형성하다`},
- {id:'p156', name:'156쪽', raw:`
+formulate|형성하다
 passerby|통행인, 행인
 pedagogical|교육학의
 naughty|버릇없는
@@ -167,8 +165,7 @@ disperse|흩어지다, 해산하다
 meek|온순한, 온화한
 dock|부두
 conjure|마술을 하다
-moist|축축한`},
- {id:'p158', name:'158쪽', raw:`
+moist|축축한
 standpoint|관점, 입장
 aviation|항공(술)
 testimony|증거
@@ -185,7 +182,7 @@ ridicule|조롱, 조롱하다
 drape|걸치다
 shovel|삽`}
 ];
-const APP_VERSION = 'v1';
+const APP_VERSION = 'v1.1';
 
 /* ---------------- 유틸 ---------------- */
 const app = document.getElementById('app');
@@ -202,7 +199,7 @@ const BUILTIN = BUILTIN_RAW.map(s => ({id:s.id, name:s.name, words:parseRaw(s.ra
 
 /* ---------------- 저장 ---------------- */
 const KEY = 'ssukssuk-words-v1';
-const defState = () => ({xp:0, wrong:{}, custom:[], sel:['p152'], best:{}, sound:true, qcount:10, front:'en', streak:0, lastDay:'', learned:{}});
+const defState = () => ({xp:0, wrong:{}, custom:[], sel:['ch1'], best:{}, sound:true, qcount:10, front:'en', streak:0, lastDay:'', learned:{}});
 function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d) return Object.assign(defState(), d); } catch(e){} return defState(); }
 let S = load();
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
@@ -669,7 +666,7 @@ function manage(){
   ${allSets().map(s=>`<details><summary>${esc(s.name)} (${s.words.length}개) ${s.builtin?'':`<button class="x" style="float:right;background:none;color:var(--no);font-weight:800" onclick="event.preventDefault();delSet('${s.id}')">삭제</button>`}</summary>
     <div class="list" style="box-shadow:none;margin-top:8px">${s.words.map(w=>`<div class="li"><span class="e">${esc(w.en)}</span><span class="m">${esc(w.ko)}</span></div>`).join('')}</div></details>`).join('')}
   <h2>➕ 새 단어장 추가</h2>
-  <input class="txt" id="nsName" placeholder="단어장 이름 (예: 160쪽)">
+  <input class="txt" id="nsName" placeholder="단어장 이름 (비워 두면 다음 챕터 번호)">
   <textarea id="nsWords" placeholder="한 줄에 하나씩 '영어 = 뜻' 형식으로 적어요&#10;apple = 사과&#10;brave = 용감한&#10;curious = 호기심 많은"></textarea>
   <div class="note">= 대신 | 나 탭으로 구분해도 돼요.</div>
   <button class="btn" onclick="addSet()">단어장 저장</button>
@@ -677,7 +674,7 @@ function manage(){
   <div class="row"><button class="btn gray" onclick="S.sound=!S.sound;save();manage()">${S.sound?'🔔 효과음 켜짐':'🔕 효과음 꺼짐'}</button><button class="btn gray" onclick="ask('점수·레벨·오답 기록을 모두 초기화할까요? (단어장은 남아요)',()=>{const c=S.custom;S=defState();S.custom=c;save();toast('초기화했어요');manage()})">♻️ 기록 초기화</button></div>`;
 }
 function addSet(){
-  const name = document.getElementById('nsName').value.trim() || ('내 단어장 '+(S.custom.length+1));
+  const name = document.getElementById('nsName').value.trim() || ('챕터 '+(allSets().length+1));
   const words = document.getElementById('nsWords').value.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
     const m = l.match(/^(.+?)\s*(?:=|\||\t|:)\s*(.+)$/); if (!m) return null;
     return {en:m[1].trim(), ko:m[2].trim()};
@@ -699,6 +696,7 @@ function ask(msg, fn){
 }
 /* 시작 */
 S.sel = S.sel.filter(id => id==='wrong' || allSets().some(s=>s.id===id));
+if (!S.sel.length) S.sel = [allSets()[allSets().length-1].id];
 home();
 </script>
 </body>
