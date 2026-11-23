@@ -226,7 +226,7 @@ ridicule|조롱, 조롱하다
 drape|걸치다
 shovel|삽`}
 ];
-const APP_VERSION = 'v1.3';
+const APP_VERSION = 'v1.4';
 
 /* ---------------- 유틸 ---------------- */
 const app = document.getElementById('app');
@@ -700,14 +700,14 @@ function missBalloon(msg){
 
 /* ================= 로봇 대결 ================= */
 const ROBOTS = [
-  {name:'아기봇',   color:'#7ed6a8', acc:.45, ms:[5500,7500]},
-  {name:'꼬마봇',   color:'#7cc4ff', acc:.55, ms:[4800,6600]},
-  {name:'씩씩봇',   color:'#ffd166', acc:.62, ms:[4200,5800]},
-  {name:'똑똑봇',   color:'#b39cff', acc:.70, ms:[3600,5000]},
-  {name:'번개봇',   color:'#ff9f5a', acc:.76, ms:[3100,4300]},
-  {name:'천재봇',   color:'#ff7bac', acc:.82, ms:[2600,3700]},
-  {name:'박사봇',   color:'#5bd1d7', acc:.88, ms:[2200,3200]},
-  {name:'마스터봇', color:'#ff5a5a', acc:.93, ms:[1800,2700]}
+  {name:'아기봇',   color:'#7ed6a8', acc:0.62, ms:[2300,3000]},
+  {name:'꼬마봇',   color:'#7cc4ff', acc:0.68, ms:[2000,2700]},
+  {name:'씩씩봇',   color:'#ffd166', acc:0.73, ms:[1750,2400]},
+  {name:'똑똑봇',   color:'#b39cff', acc:0.78, ms:[1550,2100]},
+  {name:'번개봇',   color:'#ff9f5a', acc:0.83, ms:[1350,1850]},
+  {name:'천재봇',   color:'#ff7bac', acc:0.87, ms:[1150,1600]},
+  {name:'박사봇',   color:'#5bd1d7', acc:0.91, ms:[1000,1350]},
+  {name:'마스터봇', color:'#ff5a5a', acc:0.95, ms:[800,1100]}
 ];
 const B_START = 5, B_MAX = 12, B_TIME = 90000;
 function robotSVG(c, size){
