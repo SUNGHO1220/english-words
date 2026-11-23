@@ -107,6 +107,50 @@ details{background:#fff;border-radius:16px;box-shadow:0 3px 0 var(--line);margin
 summary{font-weight:800;cursor:pointer}
 @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+/* ---- 로봇 대결 ---- */
+.lvgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lvcard{background:#fff;border-radius:18px;padding:10px 8px 12px;box-shadow:0 4px 0 var(--line);text-align:center;font-weight:800;position:relative}
+.lvcard:active{transform:translateY(3px);box-shadow:none}
+.lvcard .lvn{font-size:13px;color:var(--sub)}
+.lvcard .stars{font-size:12px;letter-spacing:1px;color:#f5a623}
+.lvcard.lock{opacity:.9}
+.lvcard .clear{position:absolute;top:6px;right:8px;font-size:16px}
+.bhud{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px;margin-bottom:8px}
+.bhud .clock{background:var(--ink);color:#fff;border-radius:999px;padding:5px 12px;font-variant-numeric:tabular-nums}
+.bhud .clock.hurry{background:var(--no);animation:pulse .6s infinite alternate}
+.arena{position:relative;height:290px;border-radius:22px;overflow:hidden;background:linear-gradient(#2b1f45 0%,#5a2b3a 60%,#8a3a22 100%);box-shadow:0 5px 0 #3a1c1c}
+.arena .ember{position:absolute;bottom:40px;width:5px;height:5px;border-radius:50%;background:#ffb02e;opacity:0;animation:ember 3s linear infinite}
+.lava{position:absolute;left:0;right:0;bottom:0;height:44px;background:linear-gradient(#ffcf3a,#ff7a1a 35%,#d8240e);z-index:3}
+.lava::before{content:'';position:absolute;left:0;right:0;top:-10px;height:20px;background:radial-gradient(circle at 10px 14px,#ffcf3a 9px,transparent 10px) 0 0/28px 20px repeat-x;animation:wave 1.4s linear infinite}
+.lava .bub{position:absolute;bottom:8px;width:9px;height:9px;border-radius:50%;background:#ffe08a;animation:bub 2s ease-in infinite}
+.bside{position:absolute;bottom:44px;width:40%;display:flex;flex-direction:column;align-items:center;z-index:2;transition:transform 1s cubic-bezier(.5,0,.9,.4)}
+.bside.me{left:5%}.bside.bot{right:5%}
+.bside.fall{transform:translateY(240px)}
+.bchar{font-size:46px;line-height:1;position:relative;transition:transform .2s}
+.bchar svg{display:block}
+.bside.hit .bchar{animation:shake .35s}
+.bside.up .bchar{animation:hop .35s}
+.bstack{display:flex;flex-direction:column-reverse;align-items:center;width:100%}
+.stone{width:78%;height:16px;margin-top:-2px;border-radius:8px;background:linear-gradient(#b7ada4,#7a7069);border:2px solid #4f4842;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.stone:nth-child(even){width:72%}
+.stone.new{animation:drop .35s ease-out}
+.bubble{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);margin-bottom:6px;background:#fff;color:var(--ink);font-size:12px;font-weight:800;padding:5px 9px;border-radius:12px;white-space:nowrap;animation:pop .2s;z-index:5}
+.bubble::after{content:'';position:absolute;left:50%;top:100%;margin-left:-5px;border:5px solid transparent;border-top-color:#fff}
+.botbar{width:60%;height:5px;background:rgba(255,255,255,.25);border-radius:4px;margin-top:4px;overflow:hidden}
+.botbar div{height:100%;background:#7ee0ff}
+.splash{position:absolute;bottom:20px;font-size:40px;z-index:4;animation:pop .3s}
+.bq .prompt{padding:16px 12px;font-size:22px;margin-top:12px}
+.bq .prompt.en{font-size:26px}
+.bq .opts{grid-template-columns:1fr 1fr;margin-top:10px;gap:8px}
+.bq .opt{padding:13px 8px;font-size:16px}
+.robot-eye{animation:blink 4s infinite;transform-origin:center;transform-box:fill-box}
+@keyframes wave{to{background-position:28px 0}}
+@keyframes bub{0%{transform:translateY(0) scale(.6);opacity:1}100%{transform:translateY(-20px) scale(1.2);opacity:0}}
+@keyframes ember{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-230px) translateX(20px);opacity:0}}
+@keyframes drop{from{transform:translateY(-30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes hop{50%{transform:translateY(-12px)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes pulse{to{transform:scale(1.08)}}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
 .toast.x{left:50%}
 </style>
@@ -182,7 +226,7 @@ ridicule|조롱, 조롱하다
 drape|걸치다
 shovel|삽`}
 ];
-const APP_VERSION = 'v1.2';
+const APP_VERSION = 'v1.3';
 
 /* ---------------- 유틸 ---------------- */
 const app = document.getElementById('app');
@@ -253,7 +297,7 @@ function topBar(title, back='home'){ return `<div class="top"><button class="bac
 function go(s){
   stopTick();
   try { window.scrollTo(0,0); } catch(e){}
-  const screens = {home:home, cards:startCards, test:testMenu, games:gameMenu, wrong:wrongScreen, manage:manage};
+  const screens = {home:home, cards:startCards, test:testMenu, games:gameMenu, wrong:wrongScreen, manage:manage, battle:battleMenu};
   try { screens[s](); } catch(e) { toast('화면 오류: ' + (e && e.message)); if (s !== 'home') home(); }
 }
 window.addEventListener('error', function(e){ toast('오류: ' + e.message); });
@@ -460,6 +504,7 @@ function gameMenu(){
   const b = S.best;
   app.innerHTML = topBar('🎮 게임') + `
   <div class="grid">
+    <button class="tile wide" onclick="go('battle')" style="background:linear-gradient(135deg,#fff3e0,#ffe0d6)"><span class="ic">🤖</span><span>로봇과 대결 <b style="color:var(--no)">NEW</b><small>용암 위 돌 쌓기 대결! 레벨 1~8 ${b.botLv?'· '+b.botLv+'단계 클리어':''}</small></span></button>
     <button class="tile wide" onclick="startMatch()"><span class="ic">🧩</span><span>짝꿍 찾기<small>영어와 뜻을 빨리 짝지어요 ${b.match?'· 최고 '+b.match+'점':''}</small></span></button>
     <button class="tile wide" onclick="startSpeed()"><span class="ic">⚡</span><span>스피드 퀴즈<small>60초 동안 최대한 많이! ${b.speed?'· 최고 '+b.speed+'점':''}</small></span></button>
     <button class="tile wide" onclick="startPuzzle()"><span class="ic">🔠</span><span>철자 퍼즐<small>섞인 알파벳을 순서대로 ${b.puzzle?'· 최고 '+b.puzzle+'점':''}</small></span></button>
@@ -651,6 +696,166 @@ function missBalloon(msg){
   toast(msg + ' → 정답: ' + G.w.en);
   if (G.life <= 0) { G.lock = true; stopTick(); setTimeout(()=>gameOver('balloon','게임 끝!', [`🎈 터뜨린 풍선: ${G.right}개`], G.score), 900); return; }
   G.lock = true; stopTick(); setTimeout(newBalloon, 1300);
+}
+
+/* ================= 로봇 대결 ================= */
+const ROBOTS = [
+  {name:'아기봇',   color:'#7ed6a8', acc:.45, ms:[5500,7500]},
+  {name:'꼬마봇',   color:'#7cc4ff', acc:.55, ms:[4800,6600]},
+  {name:'씩씩봇',   color:'#ffd166', acc:.62, ms:[4200,5800]},
+  {name:'똑똑봇',   color:'#b39cff', acc:.70, ms:[3600,5000]},
+  {name:'번개봇',   color:'#ff9f5a', acc:.76, ms:[3100,4300]},
+  {name:'천재봇',   color:'#ff7bac', acc:.82, ms:[2600,3700]},
+  {name:'박사봇',   color:'#5bd1d7', acc:.88, ms:[2200,3200]},
+  {name:'마스터봇', color:'#ff5a5a', acc:.93, ms:[1800,2700]}
+];
+const B_START = 5, B_MAX = 12, B_TIME = 90000;
+function robotSVG(c, size){
+  size = size || 56;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64">
+    <line x1="32" y1="4" x2="32" y2="13" stroke="#555" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="32" cy="5" r="4" fill="#ffd166" stroke="#555" stroke-width="2"/>
+    <rect x="9" y="12" width="46" height="34" rx="13" fill="${c}" stroke="#4a4a5a" stroke-width="3"/>
+    <rect x="4" y="24" width="6" height="12" rx="3" fill="#8a8aa0"/><rect x="54" y="24" width="6" height="12" rx="3" fill="#8a8aa0"/>
+    <rect x="16" y="19" width="32" height="20" rx="9" fill="#fff"/>
+    <g class="robot-eye"><circle cx="25" cy="28" r="4.5" fill="#2b2340"/><circle cx="39" cy="28" r="4.5" fill="#2b2340"/>
+    <circle cx="26.5" cy="26.5" r="1.5" fill="#fff"/><circle cx="40.5" cy="26.5" r="1.5" fill="#fff"/></g>
+    <path d="M27 34 Q32 38 37 34" stroke="#2b2340" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <circle cx="19" cy="34" r="2.5" fill="#ff9bb5" opacity=".8"/><circle cx="45" cy="34" r="2.5" fill="#ff9bb5" opacity=".8"/>
+    <rect x="20" y="46" width="24" height="14" rx="6" fill="${c}" stroke="#4a4a5a" stroke-width="3"/>
+    <circle cx="32" cy="53" r="3" fill="#ffd166"/>
+  </svg>`;
+}
+function battleMenu(){
+  stopTick();
+  const cleared = S.best.botLv || 0;
+  app.innerHTML = topBar('🤖 로봇과 대결', 'games') + `
+  <div class="note" style="margin:0 2px 12px;line-height:1.6">밑에는 뜨거운 <b>용암</b>! 정답을 맞히면 내 돌이 쌓이고 로봇 돌이 깎여요. 틀리면 내 돌이 깎여요. 로봇도 똑같이 문제를 풀어요. 먼저 용암에 빠지면 지고, 1분 30초가 지나면 돌이 더 많은 쪽이 이겨요.</div>
+  <div class="lvgrid">${ROBOTS.map((r,i)=>`
+    <button class="lvcard" onclick="startBattle(${i})">
+      ${i < cleared ? '<span class="clear">🏆</span>' : ''}
+      <div style="display:flex;justify-content:center">${robotSVG(r.color, 50)}</div>
+      <div class="lvn">레벨 ${i+1}</div><div>${r.name}</div>
+      <div class="stars">${'★'.repeat(Math.ceil((i+1)/2))}${'☆'.repeat(4-Math.ceil((i+1)/2))}</div>
+    </button>`).join('')}</div>`;
+}
+let BT = null;
+function startBattle(lv){
+  const p = needPool(); if (!p) return;
+  stopTick();
+  const R = ROBOTS[lv];
+  BT = {lv, R, p, me:B_START, bot:B_START, end:Date.now()+B_TIME, over:false, busy:false, right:0, wrong:0, botRight:0, botWrong:0, last:null};
+  scheduleBot();
+  const embers = Array.from({length:8}, (_,i)=>`<span class="ember" style="left:${8+i*11}%;animation-delay:${(i*0.37)%3}s"></span>`).join('');
+  const bubs = Array.from({length:6}, (_,i)=>`<span class="bub" style="left:${6+i*16}%;animation-delay:${(i*0.33)%2}s"></span>`).join('');
+  app.innerHTML = topBar('🤖 Lv.'+(lv+1)+' '+R.name, 'battle') + `
+  <div class="bhud"><span>👧 나 <span id="bmeN">${BT.me}</span></span><span class="clock" id="bclock">1:30</span><span>${R.name} <span id="bbotN">${BT.bot}</span></span></div>
+  <div class="arena" id="arena">${embers}
+    <div class="bside me" id="sideMe"><div class="bchar" id="charMe">👧</div><div class="bstack" id="stackMe"></div></div>
+    <div class="bside bot" id="sideBot"><div class="bchar" id="charBot">${robotSVG(R.color, 54)}</div><div class="botbar"><div id="botbar"></div></div><div class="bstack" id="stackBot"></div></div>
+    <div class="lava">${bubs}</div>
+  </div>
+  <div class="bq" id="bq"></div>`;
+  drawStacks();
+  nextBattleQ();
+  TICK = setInterval(battleTick, 100);
+}
+function scheduleBot(){
+  const [a,b] = BT.R.ms; const d = a + Math.random()*(b-a);
+  BT.botStart = Date.now(); BT.botAt = BT.botStart + d;
+}
+function battleTick(){
+  if (!BT || BT.over) return;
+  const now = Date.now(), left = Math.max(0, BT.end - now);
+  const c = document.getElementById('bclock'); if (!c) return stopTick();
+  const sec = Math.ceil(left/1000);
+  c.textContent = Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0');
+  c.classList.toggle('hurry', sec <= 10);
+  const bar = document.getElementById('botbar');
+  if (bar) bar.style.width = Math.min(100, (now-BT.botStart)/(BT.botAt-BT.botStart)*100) + '%';
+  if (now >= BT.botAt) { robotAct(); if (!BT.over) scheduleBot(); }
+  if (left <= 0 && !BT.over) battleEnd(BT.me > BT.bot ? 'win' : BT.me < BT.bot ? 'lose' : 'draw', 'time');
+}
+function drawStacks(added){
+  added = added || {};
+  const mk = (n, isNew) => Array.from({length:n}, (_,i)=>`<div class="stone ${isNew && i===n-1 ? 'new' : ''}"></div>`).join('');
+  document.getElementById('stackMe').innerHTML = mk(Math.min(BT.me, B_MAX), added.me);
+  document.getElementById('stackBot').innerHTML = mk(Math.min(BT.bot, B_MAX), added.bot);
+  document.getElementById('bmeN').textContent = Math.max(0, BT.me);
+  document.getElementById('bbotN').textContent = Math.max(0, BT.bot);
+}
+function bubble(who, text){
+  const ch = document.getElementById(who === 'me' ? 'charMe' : 'charBot'); if (!ch) return;
+  ch.querySelectorAll('.bubble').forEach(x=>x.remove());
+  const d = document.createElement('div'); d.className = 'bubble'; d.textContent = text; ch.appendChild(d);
+  setTimeout(()=>d.remove(), 1300);
+}
+function anim(who, cls){
+  const s = document.getElementById(who === 'me' ? 'sideMe' : 'sideBot'); if (!s) return;
+  s.classList.remove('hit','up'); void s.offsetWidth; s.classList.add(cls);
+}
+function changeStones(meD, botD){
+  BT.me = Math.min(B_MAX, BT.me + meD); BT.bot = Math.min(B_MAX, BT.bot + botD);
+  drawStacks({me: meD > 0, bot: botD > 0});
+  if (meD < 0) anim('me','hit'); else if (meD > 0) anim('me','up');
+  if (botD < 0) anim('bot','hit'); else if (botD > 0) anim('bot','up');
+  if (BT.me <= 0 || BT.bot <= 0) battleEnd(BT.me <= 0 && BT.bot <= 0 ? 'draw' : BT.me <= 0 ? 'lose' : 'win', 'lava');
+}
+function robotAct(){
+  const ok = Math.random() < BT.R.acc;
+  if (ok) { BT.botRight++; bubble('bot', rand(['삐빅! 정답!','쉽다 삐~','맞혔다! 🔧','계산 완료!'])); changeStones(-1, +1); }
+  else { BT.botWrong++; bubble('bot', rand(['앗, 틀렸다…','삐… 실수!','에러 발생 😵','회로가 꼬였어!'])); changeStones(0, -1); }
+}
+function nextBattleQ(){
+  if (BT.over) return;
+  let w; do { w = rand(BT.p); } while (BT.p.length > 1 && w === BT.last);
+  BT.last = w; BT.w = w; BT.dir = Math.random() < .5 ? 'en2ko' : 'ko2en'; BT.opts = makeOpts(w); BT.busy = false;
+  document.getElementById('bq').innerHTML = `
+    <div class="prompt ${BT.dir==='en2ko'?'en':''}">${esc(BT.dir==='en2ko'?w.en:w.ko)}</div>
+    <div class="opts">${BT.opts.map((o,k)=>`<button class="opt" id="bo${k}" onclick="pickBattle(${k})">${esc(BT.dir==='en2ko'?o.ko:o.en)}</button>`).join('')}</div>`;
+}
+function pickBattle(k){
+  if (BT.busy || BT.over) return; BT.busy = true;
+  const ok = BT.opts[k].en === BT.w.en;
+  BT.opts.forEach((o,j)=>{ if (o.en === BT.w.en) document.getElementById('bo'+j).classList.add('right'); });
+  beep(ok);
+  if (ok) { BT.right++; markRight(BT.w); bubble('me', rand(['정답! 💪','좋았어!','앗싸!'])); changeStones(+1, -1); }
+  else { BT.wrong++; markWrong(BT.w); document.getElementById('bo'+k).classList.add('wrong'); bubble('me', '앗 뜨거! 🔥'); changeStones(-1, 0); }
+  save();
+  setTimeout(nextBattleQ, ok ? 350 : 1100);
+}
+function battleEnd(result, why){
+  if (BT.over) return; BT.over = true; stopTick();
+  const loser = result === 'lose' ? 'me' : result === 'win' ? 'bot' : null;
+  if (why === 'lava' && loser) {
+    document.getElementById(loser === 'me' ? 'sideMe' : 'sideBot').classList.add('fall');
+    const sp = document.createElement('div'); sp.className = 'splash'; sp.textContent = '💥';
+    sp.style.left = loser === 'me' ? '18%' : '62%';
+    setTimeout(()=>{ const a = document.getElementById('arena'); if (a) a.appendChild(sp); }, 700);
+  }
+  document.querySelectorAll('#bq .opt').forEach(b=>b.disabled = true);
+  setTimeout(()=>battleResult(result, why), why === 'lava' ? 1600 : 600);
+}
+function battleResult(result, why){
+  const lv = BT.lv, R = BT.R;
+  let pts = BT.right * 5;
+  if (result === 'win') { pts += 20 + lv*10; S.best.botLv = Math.max(S.best.botLv||0, lv+1); }
+  addXP(pts);
+  const head = result === 'win' ? '🏆 승리!' : result === 'lose' ? '😵 아쉬워요!' : '🤝 무승부!';
+  const msg = result === 'win' ? (why === 'lava' ? R.name+'이(가) 용암에 풍덩! 🌋' : '시간 종료! 돌이 더 많아요!')
+            : result === 'lose' ? (why === 'lava' ? '용암에 빠졌어요… 다시 도전!' : '시간 종료! 로봇 돌이 더 많아요')
+            : '돌 개수가 똑같아요!';
+  app.innerHTML = topBar('🤖 대결 결과', 'battle') + `
+  <div class="result">
+    <div style="display:flex;justify-content:center">${robotSVG(R.color, 70)}</div>
+    <div class="pct" style="font-size:36px">${head}</div>
+    <div class="msg">${msg}</div>
+    <div style="margin-top:12px;font-weight:700;line-height:1.8">👧 나: 정답 ${BT.right} · 오답 ${BT.wrong}<br>🤖 ${R.name}: 정답 ${BT.botRight} · 오답 ${BT.botWrong}</div>
+    <div class="plus">+${pts}점</div>
+  </div>
+  ${result === 'win' && lv < 7 ? `<button class="btn green" onclick="startBattle(${lv+1})">다음 레벨 도전 → Lv.${lv+2} ${ROBOTS[lv+1].name}</button>` : ''}
+  <div class="row"><button class="btn" onclick="startBattle(${lv})">다시 대결</button><button class="btn gray" onclick="go('battle')">레벨 선택</button></div>`;
+  if (result === 'win') confetti();
 }
 
 /* ================= 오답 노트 ================= */
